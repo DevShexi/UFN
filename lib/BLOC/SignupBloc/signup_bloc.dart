@@ -6,16 +6,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-part 'login_event.dart';
-part 'login_state.dart';
+part 'signup_event.dart';
+part 'signup_state.dart';
 
-class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(LoginState());
+class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
+  SignUpBloc() : super(SignUpState());
   AuthenticationRepository authRepo = AuthenticationRepository();
 
   @override
-  Stream<LoginState> mapEventToState(
-    LoginEvent event,
+  Stream<SignUpState> mapEventToState(
+    SignUpEvent event,
   ) async* {
     if (event is EmailChanged) {
       print('Email Changed Triggered from Bloc: ${event.email}');
@@ -39,21 +39,35 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           passwordError: "",
         );
       }
-    } else if (event is AttemptLogin) {
-      print('Login Attemp Initiated');
-      if (state.email != null &&
-          state.password != null &&
+    } else if (event is ConfirmPasswordChanged) {
+      if (event.confirmPassword != state.password) {
+        yield state.copyWith(
+            confirmPassword: event.confirmPassword,
+            confirmPasswordError: "Passwords Dont Match!");
+      } else {
+        yield state.copyWith(
+          password: event.confirmPassword,
+          confirmPasswordError: "",
+        );
+      }
+    } else if (event is AttemptSignUp) {
+      print('SignUp Attemp Initiated');
+      if (state.emailError == "" &&
+          state.passwordError == "" &&
           RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
               .hasMatch(state.email) &&
+          state.confirmPasswordError == "" &&
           state.password.length >= 6) {
-        print('Login in Progress yielded');
-        yield LoginSuccess();
+        print('SignUp in Progress yielded');
+        yield SignUpSuccess();
       } else
         yield state.copyWith(
-            email: null,
-            emailError: "Please Ente a valid email address",
-            password: null,
-            passwordError: "Password must be atleast 6 characters long");
+          email: null,
+          emailError: "Please Ente a valid email address",
+          password: null,
+          passwordError: "Password must be atleast 6 characters long",
+          confirmPassword: null,
+        );
     }
   }
 }

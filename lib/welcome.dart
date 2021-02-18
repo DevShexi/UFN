@@ -15,7 +15,7 @@ class _WelcomeState extends State<Welcome> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(40.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,7 @@ class _WelcomeState extends State<Welcome> {
                 ],
               ),
               SizedBox(
-                height: 10.0,
+                height: 30.0,
               ),
             ],
           ),

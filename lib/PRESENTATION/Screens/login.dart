@@ -1,58 +1,74 @@
-import 'package:UFN/BLOC/SignupBloc/signup_bloc.dart';
-import 'package:UFN/Widgets/inputField.dart';
-import 'package:UFN/colors.dart';
+import 'package:UFN/BLOC/LoginBloc/login_bloc.dart';
+import 'package:UFN/PRESENTATION/Widgets/button.dart';
+import 'package:UFN/PRESENTATION/Widgets/inputField.dart';
+import 'package:UFN/PRESENTATION/Screens/signUp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'Constants/constants.dart';
-import 'Widgets/button.dart';
-import 'login.dart';
 
-class SignUp extends StatelessWidget {
+import '../../Constants/constants.dart';
+import '../../colors.dart';
+
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  bool showPassword = false;
+  IconData icon = Icons.visibility;
+  togglePasswordVisibility() {
+    setState(() {
+      showPassword = !showPassword;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SignUpBloc(),
+      create: (context) => LoginBloc(),
       child: Scaffold(
-        body: SafeArea(
-          child: BlocListener<SignUpBloc, SignUpState>(
-            listener: (context, state) {
-              if (state is SignUpSuccess) {
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('SignUp Success'),
+        body: BlocListener<LoginBloc, LoginState>(
+          listener: (context, state) {
+            if (state is LoginSuccess) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: red,
+                  content: Text(
+                    'Loggin Was Successful',
+                    style: TextStyle(color: Colors.white),
                   ),
-                );
-              }
-            },
+                ),
+              );
+            }
+          },
+          child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 185,
-                    ),
+                    SizedBox(height: 200),
                     Text(
-                      'Welcome,',
+                      'Hey,',
                       style: kHeading26Black,
                     ),
                     Text(
-                      'Create Accoount',
+                      'Login Now',
                       style: kHeading26Black,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
                         children: [
-                          Text('Already have an account / '),
+                          Text('If you are new / '),
                           InkWell(
                             onTap: () {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (BuildContext context) => Login(),
+                                  builder: (BuildContext context) => SignUp(),
                                 ),
                               );
                             },
@@ -60,7 +76,7 @@ class SignUp extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 10.0, horizontal: 8.0),
                               child: Text(
-                                'Login',
+                                'Create New',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -71,7 +87,7 @@ class SignUp extends StatelessWidget {
                     SizedBox(
                       height: 20,
                     ),
-                    BlocBuilder<SignUpBloc, SignUpState>(
+                    BlocBuilder<LoginBloc, LoginState>(
                       builder: (context, state) {
                         return Column(
                           children: [
@@ -82,35 +98,54 @@ class SignUp extends StatelessWidget {
                               hint: "Email",
                               error: state.emailError,
                               changeHandler: (email) {
-                                context.read<SignUpBloc>().add(
-                                      EmailChanged(email: email),
-                                    );
+                                context
+                                    .read<LoginBloc>()
+                                    .add(EmailChanged(email: email));
                               },
                             ),
                             InputField(
                               label: "Password",
+                              // icon: showPassword ? Icons.visibility : Icons.visibility_off,
+                              // togglePasswordVisibility: togglePasswordVisibility,
                               keyType: TextInputType.name,
                               obscure: true,
                               hint: "Password",
                               error: state.passwordError,
                               changeHandler: (password) {
-                                context.read<SignUpBloc>().add(
-                                      PasswordChanged(password: password),
-                                    );
+                                context
+                                    .read<LoginBloc>()
+                                    .add(PasswordChanged(password: password));
                               },
                             ),
-                            InputField(
-                              label: "Confirm Password",
-                              keyType: TextInputType.name,
-                              obscure: true,
-                              hint: "Confirm Password",
-                              error: state.confirmPasswordError,
-                              changeHandler: (confirmPassword) {
-                                context.read<SignUpBloc>().add(
-                                      ConfirmPasswordChanged(
-                                          confirmPassword: confirmPassword),
-                                    );
-                              },
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: [
+                                  Text('Forgot Password / '),
+                                  InkWell(
+                                    onTap: () {
+                                      // Navigator.pushReplacement(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (BuildContext context) => SignUp(),
+                                      //   ),
+                                      // );
+                                      print(
+                                          'User requested to Reset the Password');
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10.0, horizontal: 8.0),
+                                      child: Text(
+                                        'Reset',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Padding(
                               padding:
@@ -120,13 +155,13 @@ class SignUp extends StatelessWidget {
                                   Button(
                                       label: 'Login',
                                       action: () {
-                                        context.read<SignUpBloc>().add(
-                                              AttemptSignUp(
+                                        context.read<LoginBloc>().add(
+                                              AttemptLogin(
                                                   email: state.email,
-                                                  password: state.password,
-                                                  confirmPassword:
-                                                      state.confirmPassword),
+                                                  password: state.password),
                                             );
+                                        // print("User Email: ${state.email}");
+                                        // print("User Password: ${state.password}");
                                       },
                                       color: red),
                                 ],

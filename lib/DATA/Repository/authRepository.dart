@@ -7,11 +7,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthenticationRepository {
   AuthenticationRepository();
 
-  Future<String> getjwt() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String authResponse = prefs.getString("auth_response");
-    final decodeData = json.decode(authResponse);
-    return decodeData["session"]["jwt"];
+  Future<String> getToken() async {
+    final String authURL =
+        'http://134.122.14.40:8080/iteam/services/MDB/authenticate';
+    final http.Response response = await http.post(authURL,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'accept': 'application/json',
+        },
+        body: '{"username": "mnoman", "password": "Temp/mnoman123"}');
+    var decodeData = json.decode(response.body);
+    print(decodeData['token']);
+    return decodeData['token'];
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // String authResponse = prefs.getString("auth_response");
+    // final decodeData = json.decode(authResponse);
+    // return decodeData["session"]["jwt"];
   }
 
   /// Stream of [User] which will emit the current user when
@@ -23,59 +34,38 @@ class AuthenticationRepository {
   // }
 
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
-    final String loginUrl = "http://3.138.49.8:4000/api/v1/auth/attempt";
-    final http.Response response = await http.post(
-      loginUrl,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(
-        <String, Map>{
-          'session': {
-            'username': "$email",
-            'password': "$password",
-            'device_type': 'android',
-            'device_id': "DeviceTokenGeneratedViaFCM",
-            'app': 'admin'
-          }
+    final String token = await getToken();
+    final String jsonBody = '{"email": "$email", "password": "$password"}';
+    final String loginUrl =
+        "http://134.122.14.40:8080/iteam/services/UFN/getUsers";
+    final http.Response response = await http.post(loginUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'accept': 'application/json',
+          'Authorization': 'Bearer $token'
         },
-      ),
-    );
+        body: jsonBody);
+    print(response.statusCode);
     var decodeData = json.decode(response.body);
     try {
       if (response.statusCode == 200) {
-        if (decodeData.containsKey("errors")) {
-          return decodeData["errors"];
-        } else {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString("auth_response", response.body);
-          return {"status": true};
+        if (decodeData['users'] == null) {
+          //this means that no user is registered for that email.
+          print('No user exists for specified email!');
+        } else if (decodeData['users'][0]['password'] == password) {
+          //this measn that the password matches
+          //the user should be allowed to use the app is this case
+          print('Login Successful. Wellcome Back');
         }
-      } else if (response.statusCode == 422) {
-        switch (decodeData["meta"]["status"]) {
-          case "bad_password":
-            {
-              print("From BadPassword, Returned: ");
-              print(decodeData['errors']);
-              return decodeData["errors"];
-            }
-            break;
-          case "not_found":
-            {
-              print("From Not Found, Returned: ");
-              print(decodeData["errors"]);
-              return decodeData["errors"];
-            }
-            break;
-          default:
-            return null;
-        }
+      } else if (decodeData['users'][0]['password'] != password) {
+        //this means that the user exists but the password is incorrect.
+        print('Your Password is incorrect');
       } else {
         print('Login Failed');
         return null;
       }
     } catch (e) {
-      print("Exception Caught while Auth Attempt: $e");
+      print("Exception Caught while Login Attempt: $e");
       return null;
     }
   }

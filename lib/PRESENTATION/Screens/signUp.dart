@@ -1,74 +1,58 @@
-import 'package:UFN/BLOC/LoginBloc/login_bloc.dart';
-import 'package:UFN/Widgets/button.dart';
-import 'package:UFN/Widgets/inputField.dart';
-import 'package:UFN/signUp.dart';
+import 'package:UFN/BLOC/SignupBloc/signup_bloc.dart';
+import 'package:UFN/PRESENTATION/Widgets/button.dart';
+import 'package:UFN/PRESENTATION/Widgets/inputField.dart';
+import 'package:UFN/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../Constants/constants.dart';
+import 'login.dart';
 
-import 'Constants/constants.dart';
-import 'colors.dart';
-
-class Login extends StatefulWidget {
-  @override
-  _LoginState createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
-  bool showPassword = false;
-  IconData icon = Icons.visibility;
-  togglePasswordVisibility() {
-    setState(() {
-      showPassword = !showPassword;
-    });
-  }
-
+class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LoginBloc(),
+      create: (context) => SignUpBloc(),
       child: Scaffold(
-        body: BlocListener<LoginBloc, LoginState>(
-          listener: (context, state) {
-            if (state is LoginSuccess) {
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: red,
-                  content: Text(
-                    'Loggin Was Successful',
-                    style: TextStyle(color: Colors.white),
+        body: SafeArea(
+          child: BlocListener<SignUpBloc, SignUpState>(
+            listener: (context, state) {
+              if (state is SignUpSuccess) {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('SignUp Success'),
                   ),
-                ),
-              );
-            }
-          },
-          child: SafeArea(
+                );
+              }
+            },
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 200),
+                    SizedBox(
+                      height: 185,
+                    ),
                     Text(
-                      'Hey,',
+                      'Welcome,',
                       style: kHeading26Black,
                     ),
                     Text(
-                      'Login Now',
+                      'Create Accoount',
                       style: kHeading26Black,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
                         children: [
-                          Text('If you are new / '),
+                          Text('Already have an account / '),
                           InkWell(
                             onTap: () {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (BuildContext context) => SignUp(),
+                                  builder: (BuildContext context) => Login(),
                                 ),
                               );
                             },
@@ -76,7 +60,7 @@ class _LoginState extends State<Login> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 10.0, horizontal: 8.0),
                               child: Text(
-                                'Create New',
+                                'Login',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -87,7 +71,7 @@ class _LoginState extends State<Login> {
                     SizedBox(
                       height: 20,
                     ),
-                    BlocBuilder<LoginBloc, LoginState>(
+                    BlocBuilder<SignUpBloc, SignUpState>(
                       builder: (context, state) {
                         return Column(
                           children: [
@@ -98,54 +82,35 @@ class _LoginState extends State<Login> {
                               hint: "Email",
                               error: state.emailError,
                               changeHandler: (email) {
-                                context
-                                    .read<LoginBloc>()
-                                    .add(EmailChanged(email: email));
+                                context.read<SignUpBloc>().add(
+                                      EmailChanged(email: email),
+                                    );
                               },
                             ),
                             InputField(
                               label: "Password",
-                              // icon: showPassword ? Icons.visibility : Icons.visibility_off,
-                              // togglePasswordVisibility: togglePasswordVisibility,
                               keyType: TextInputType.name,
                               obscure: true,
                               hint: "Password",
                               error: state.passwordError,
                               changeHandler: (password) {
-                                context
-                                    .read<LoginBloc>()
-                                    .add(PasswordChanged(password: password));
+                                context.read<SignUpBloc>().add(
+                                      PasswordChanged(password: password),
+                                    );
                               },
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                children: [
-                                  Text('Forgot Password / '),
-                                  InkWell(
-                                    onTap: () {
-                                      // Navigator.pushReplacement(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //     builder: (BuildContext context) => SignUp(),
-                                      //   ),
-                                      // );
-                                      print(
-                                          'User requested to Reset the Password');
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10.0, horizontal: 8.0),
-                                      child: Text(
-                                        'Reset',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            InputField(
+                              label: "Confirm Password",
+                              keyType: TextInputType.name,
+                              obscure: true,
+                              hint: "Confirm Password",
+                              error: state.confirmPasswordError,
+                              changeHandler: (confirmPassword) {
+                                context.read<SignUpBloc>().add(
+                                      ConfirmPasswordChanged(
+                                          confirmPassword: confirmPassword),
+                                    );
+                              },
                             ),
                             Padding(
                               padding:
@@ -155,13 +120,13 @@ class _LoginState extends State<Login> {
                                   Button(
                                       label: 'Login',
                                       action: () {
-                                        context.read<LoginBloc>().add(
-                                              AttemptLogin(
+                                        context.read<SignUpBloc>().add(
+                                              AttemptSignUp(
                                                   email: state.email,
-                                                  password: state.password),
+                                                  password: state.password,
+                                                  confirmPassword:
+                                                      state.confirmPassword),
                                             );
-                                        // print("User Email: ${state.email}");
-                                        // print("User Password: ${state.password}");
                                       },
                                       color: red),
                                 ],

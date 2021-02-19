@@ -47,7 +47,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               .hasMatch(state.email) &&
           state.password.length >= 6) {
         print('Login in Progress yielded');
-        yield LoginSuccess();
+        authRepo.loginUser(state.email, state.password);
+        // yield LoginSuccess();
       } else
         yield state.copyWith(
             email: null,

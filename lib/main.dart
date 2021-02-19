@@ -1,8 +1,9 @@
-import 'package:UFN/signUp.dart';
-import 'package:UFN/welcome.dart';
+import 'package:UFN/PRESENTATION/Screens/home.dart';
+import 'package:UFN/PRESENTATION/Screens/signUp.dart';
+import 'package:UFN/PRESENTATION/Screens/welcome.dart';
 import 'package:flutter/material.dart';
 import 'colors.dart';
-import 'login.dart';
+import 'PRESENTATION/Screens/login.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => Welcome(),
         '/login': (context) => Login(),
         '/signup': (context) => SignUp(),
+        '/home': (context)=> Home(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

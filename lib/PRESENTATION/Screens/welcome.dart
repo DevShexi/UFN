@@ -1,7 +1,6 @@
 import 'package:UFN/Constants/constants.dart';
+import 'package:UFN/PRESENTATION/Widgets/button.dart';
 import 'package:flutter/material.dart';
-
-import 'Widgets/button.dart';
 
 class Welcome extends StatefulWidget {
   @override
@@ -49,6 +48,24 @@ class _WelcomeState extends State<Welcome> {
                     action: () {
                       Navigator.pushNamed(context, '/login');
                     },
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/home');
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 8.0),
+                      child: Text(
+                        'Skip',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ],
               ),

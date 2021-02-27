@@ -29,8 +29,25 @@ class LoginState extends Equatable {
 
 class LoginSuccess extends LoginState {
   LoginSuccess();
+  @override
+  List<Object> get props => [];
 }
 
-class LoginFailed extends LoginState {
-  LoginFailed();
+class ValidateUserLogin extends LoginState {
+  final email;
+  final password;
+  ValidateUserLogin({@required this.email, @required this.password});
+  List<Object> get props => [email, password];
+}
+
+class NoUserExists extends LoginState {
+  final emailError;
+  NoUserExists({this.emailError});
+  List<Object> get props => [emailError];
+}
+
+class InvalidPassword extends LoginState {
+  final passwordError;
+  InvalidPassword({this.passwordError});
+  List<Object> get props => [passwordError];
 }

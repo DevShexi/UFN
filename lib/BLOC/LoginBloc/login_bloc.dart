@@ -40,21 +40,27 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         );
       }
     } else if (event is AttemptLogin) {
-      print('Login Attemp Initiated');
       if (state.email != null &&
           state.password != null &&
           RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
               .hasMatch(state.email) &&
           state.password.length >= 6) {
-        print('Login in Progress yielded');
-        authRepo.loginUser(state.email, state.password);
-        // yield LoginSuccess();
+        yield ValidateUserLogin(email: event.email, password: event.password);
       } else
         yield state.copyWith(
             email: null,
             emailError: "Please Ente a valid email address",
             password: null,
             passwordError: "Password must be atleast 6 characters long");
+    } else if (event is ValidateLogin) {
+      final response = await (authRepo.loginUser(event.email, event.password));
+      print(response);
+      if (response['userFound'] == false) {
+        yield NoUserExists(emailError: response['message']);
+      } else if (response['passwordMatched'] == false) {
+        yield InvalidPassword(passwordError: response['message']);
+      } else
+        yield LoginSuccess();
     }
   }
 }

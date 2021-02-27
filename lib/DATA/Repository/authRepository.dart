@@ -17,7 +17,6 @@ class AuthenticationRepository {
         },
         body: '{"username": "mnoman", "password": "Temp/mnoman123"}');
     var decodeData = json.decode(response.body);
-    print(decodeData['token']);
     return decodeData['token'];
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // String authResponse = prefs.getString("auth_response");
@@ -34,6 +33,7 @@ class AuthenticationRepository {
   // }
 
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
+    print('Email: $email \n Password: $password');
     final String token = await getToken();
     final String jsonBody = '{"email": "$email", "password": "$password"}';
     final String loginUrl =
@@ -47,27 +47,43 @@ class AuthenticationRepository {
         body: jsonBody);
     print(response.statusCode);
     var decodeData = json.decode(response.body);
+    // print(decodeData['users'][0]['password']);
+    Map authStatus = {
+      "userFound": null,
+      "passwordMatched": null,
+      "message": null
+    };
     try {
       if (response.statusCode == 200) {
         if (decodeData['users'] == null) {
-          //this means that no user is registered for that email.
-          print('No user exists for specified email!');
-        } else if (decodeData['users'][0]['password'] == password) {
-          //this measn that the password matches
-          //the user should be allowed to use the app is this case
-          print('Login Successful. Wellcome Back');
-        }
-      } else if (decodeData['users'][0]['password'] != password) {
-        //this means that the user exists but the password is incorrect.
-        print('Your Password is incorrect');
-      } else {
-        print('Login Failed');
-        return null;
+          authStatus = {
+            "userFound": false,
+            "passwordMatched": null,
+            "message": "No User Exists for the specified Email"
+          };
+        } else if (decodeData['users'].length == 1 &&
+            decodeData['users'][0]['password'] != password) {
+          authStatus = {
+            "userFound": true,
+            "passwordMatched": false,
+            "message": "Your Password is incorrect"
+          };
+        } else
+          authStatus = {
+            "userFound": true,
+            "passwordMatched": true,
+            "message": "User Logged In Successfully"
+          };
       }
     } catch (e) {
-      print("Exception Caught while Login Attempt: $e");
-      return null;
+      print('Exception Caught on Login Request: $e');
     }
+    print(authStatus);
+    return {
+      "userFound": authStatus['userFound'],
+      "passwordMatched": authStatus['passwordMatched'],
+      "message": authStatus['message']
+    };
   }
 
 //   Future<bool> logout() async {

@@ -27,4 +27,12 @@ class AttemptLogin extends LoginEvent {
   final email;
   final password;
   const AttemptLogin({@required this.email, @required this.password});
+  List<Object> get props => [email, password];
+}
+
+class ValidateLogin extends LoginEvent {
+  final email;
+  final password;
+  const ValidateLogin({@required this.email, @required this.password});
+  List<Object> get props => [email, password];
 }

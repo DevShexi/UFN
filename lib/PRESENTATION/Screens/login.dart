@@ -29,12 +29,40 @@ class _LoginState extends State<Login> {
       child: Scaffold(
         body: BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
+            if (state is ValidateUserLogin) {
+              print(
+                  "VALIDATE_USER_LOGIN-> Email: ${state.email}, Password: ${state.password}");
+              context.read<LoginBloc>().add(
+                  ValidateLogin(email: state.email, password: state.password));
+            }
             if (state is LoginSuccess) {
               Scaffold.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: red,
                   content: Text(
                     'Loggin Was Successful',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            }
+            if (state is NoUserExists) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: red,
+                  content: Text(
+                    'No User Exists For this Email',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            }
+            if (state is InvalidPassword) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: red,
+                  content: Text(
+                    'Your Password is Incorrect',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

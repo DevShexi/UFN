@@ -20,15 +20,7 @@ class _HomeState extends State<Home> {
       ),
       body: Container(
         child: Center(
-          child: RaisedButton(
-              onPressed: () async {
-                AuthenticationRepository authRepo =
-                    new AuthenticationRepository();
-                final String email = "damon@gmail.com";
-                final String password = "123456";
-                authRepo.loginUser(email, password);
-              },
-              child: Text('Get Token')),
+          child: Text('Home Screen'),
         ),
       ),
     );
